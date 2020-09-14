@@ -1,0 +1,202 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.18">
+  <POU Name="Main" Id="{5a0760bd-be75-4c4b-bdc9-8f0615bfe56a}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM Main
+VAR
+    // PMPS
+    fbArbiter: FB_Arbiter(0);
+    fbFFHWO: FB_HardwareFFOutput := (bAutoReset := TRUE);
+    fbDummy: FB_DummyArbIO;
+
+    // PPM
+    M1: DUT_MotionStage;
+    fbM1: FB_MotionStageSim;
+    fbPPM: FB_PPM;
+    stPPMOut: DUT_PositionState;
+    stPPMPower: DUT_PositionState;
+    stPPMYag1: DUT_PositionState;
+    stPPMYag2: DUT_PositionState;
+    
+    // REF
+    M2: DUT_MotionStage;
+    fbM2: FB_MotionStageSim;
+    fbREF: FB_REF;
+    stREFOut: DUT_PositionState;
+    stREFIn: DUT_PositionState;
+    
+    // WFS
+    M3: DUT_MotionStage;
+    fbM3: FB_MotionStageSim;
+    M4: DUT_MotionStage;
+    fbM4: FB_MotionStageSim;
+    fbWFS: FB_WFS;
+    stWFSOut: DUT_PositionState;
+    stWFS1: DUT_PositionState;
+    stWFS2: DUT_PositionState;
+    stWFS3: DUT_PositionState;
+    stWFS4: DUT_PositionState;
+    stWFS5: DUT_PositionState;
+    
+    // XPIM
+    M5: DUT_MotionStage;
+    fbM5: FB_MotionStageSim;
+    M6: DUT_MotionStage;
+    fbM6: FB_MotionStageSim;
+    M7: DUT_MotionStage;
+    fbM7: FB_MotionStageSim;
+    stEl6In: EL6inData22b;
+    stEl6Out: EL6OutData22b;
+    fbXPIM: FB_XPIM;
+    stXPIMOut: DUT_PositionState;
+    stXPIMRet: DUT_PositionState;
+    stXPIMYag: DUT_PositionState;
+    stXPIMDia: DUT_PositionState;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fbM1(stMotionStage:=M1);
+fbM2(stMotionStage:=M2);
+fbM3(stMotionStage:=M3);
+fbM4(stMotionStage:=M4);
+fbM5(stMotionStage:=M5);
+fbM6(stMotionStage:=M6);
+fbM7(stMotionStage:=M7);
+
+fbPPM.nTransitionAssertionID := 16#2100;
+fbPPM.nUnknownAssertionID := 16#2109;
+fbPPM.stOut.fPosition := 0;
+fbPPM.stOut.bUseRawCounts := FALSE;
+fbPPM.stOut.nRequestAssertionID := 16#2101;
+fbPPM.stOut.stBeamParams := PMPS_GVL.cstFullBeam;
+fbPPM.stOut.bValid := TRUE;
+fbPPM.stPower.fPosition := -10;
+fbPPM.stPower.bUseRawCounts := FALSE;
+fbPPM.stPower.nRequestAssertionID := 16#2102;
+fbPPM.stPower.stBeamParams := PMPS_GVL.cstFullBeam;
+fbPPM.stPower.bValid := TRUE;
+fbPPM.stYag1.fPosition := -20;
+fbPPM.stYag1.bUseRawCounts := FALSE;
+fbPPM.stYag1.nRequestAssertionID := 16#2103;
+fbPPM.stYag1.stBeamParams := PMPS_GVL.cstFullBeam;
+fbPPM.stYag1.bValid := TRUE;
+fbPPM.stYag2.fPosition := -30;
+fbPPM.stYag2.bUseRawCounts := FALSE;
+fbPPM.stYag2.nRequestAssertionID := 16#2104;
+fbPPM.stYag2.stBeamParams := PMPS_GVL.cstFullBeam;
+fbPPM.stYag2.bValid := TRUE;
+
+fbPPM(
+    stYStage := M1,
+    fbArbiter := fbArbiter,
+    fbFFHWO := fbFFHWO);
+
+fbREF.nTransitionAssertionID := 16#4100;
+fbREF.nUnknownAssertionID := 16#4109;
+fbREF.stOut.fPosition := 0;
+fbREF.stOut.bUseRawCounts := FALSE;
+fbREF.stOut.nRequestAssertionID := 16#4101;
+fbREF.stOut.stBeamParams := PMPS_GVL.cstFullBeam;
+fbREF.stOut.bValid := TRUE;
+fbREF.stIn.fPosition := -10;
+fbREF.stIn.bUseRawCounts := FALSE;
+fbREF.stIn.nRequestAssertionID := 16#4101;
+fbREF.stIn.stBeamParams := PMPS_GVL.cstSafeBeam;
+fbREF.stIn.bValid := TRUE;
+
+fbREF(
+    stYStage := M2,
+    fbArbiter := fbArbiter,
+    fbFFHWO := fbFFHWO);
+
+fbWFS.nTransitionAssertionID := 16#3100;
+fbWFS.nUnknownAssertionID := 16#3109;
+fbWFS.stOut.fPosition := 0;
+fbWFS.stOut.bUseRawCounts := FALSE;
+fbWFS.stOut.nRequestAssertionID := 16#3101;
+fbWFS.stOut.stBeamParams := PMPS_GVL.cstFullBeam;
+fbWFS.stOut.bValid := TRUE;
+fbWFS.stTarget1.fPosition := -10;
+fbWFS.stTarget1.bUseRawCounts := FALSE;
+fbWFS.stTarget1.nRequestAssertionID := 16#3102;
+fbWFS.stTarget1.stBeamParams := PMPS_GVL.cstFullBeam;
+fbWFS.stTarget1.stBeamParams.nTran := 20;
+fbWFS.stTarget1.stBeamParams.neVRange := 2#1111_1111_1000_0011;
+fbWFS.stTarget1.bValid := TRUE;
+fbWFS.stTarget2.fPosition := -20;
+fbWFS.stTarget2.bUseRawCounts := FALSE;
+fbWFS.stTarget2.nRequestAssertionID := 16#3103;
+fbWFS.stTarget2.stBeamParams := PMPS_GVL.cstFullBeam;
+fbWFS.stTarget2.stBeamParams.nTran := 20;
+fbWFS.stTarget2.stBeamParams.neVRange := 2#1111_1111_1000_0011;
+fbWFS.stTarget2.bValid := TRUE;
+fbWFS.stTarget3.fPosition := -30;
+fbWFS.stTarget3.bUseRawCounts := FALSE;
+fbWFS.stTarget3.nRequestAssertionID := 16#3104;
+fbWFS.stTarget3.stBeamParams := PMPS_GVL.cstFullBeam;
+fbWFS.stTarget3.stBeamParams.nTran := 10;
+fbWFS.stTarget3.bValid := TRUE;
+fbWFS.stTarget4.fPosition := -40;
+fbWFS.stTarget4.bUseRawCounts := FALSE;
+fbWFS.stTarget4.nRequestAssertionID := 16#3105;
+fbWFS.stTarget4.stBeamParams := PMPS_GVL.cstFullBeam;
+fbWFS.stTarget4.stBeamParams.nTran := 10;
+fbWFS.stTarget4.bValid := TRUE;
+fbWFS.stTarget5.fPosition := -50;
+fbWFS.stTarget5.bUseRawCounts := FALSE;
+fbWFS.stTarget5.nRequestAssertionID := 16#3106;
+fbWFS.stTarget5.stBeamParams := PMPS_GVL.cstFullBeam;
+fbWFS.stTarget5.stBeamParams.nTran := 10;
+fbWFS.stTarget5.bValid := TRUE;
+    
+fbWFS(
+    stYStage := M3,
+    stZStage := M4,
+    fbArbiter := fbArbiter,
+    fbFFHWO := fbFFHWO,
+    nTransitionAssertionID := 16#3100,
+    nUnknownAssertionID := 16#3109);
+
+fbXPIM.nTransitionAssertionID := 16#2200;
+fbXPIM.nUnknownAssertionID := 16#2209;
+fbXPIM.stOut.fPosition := 0;
+fbXPIM.stOut.bUseRawCounts := FALSE;
+fbXPIM.stOut.nRequestAssertionID := 16#2201;
+fbXPIM.stOut.stBeamParams := PMPS_GVL.cstFullBeam;
+fbXPIM.stOut.bValid := TRUE;
+fbXPIM.stYag.fPosition := -10;
+fbXPIM.stYag.bUseRawCounts := FALSE;
+fbXPIM.stYag.nRequestAssertionID := 16#2202;
+fbXPIM.stYag.stBeamParams := PMPS_GVL.cstFullBeam;
+fbXPIM.stYag.bValid := TRUE;
+fbXPIM.stDiamond.fPosition := -20;
+fbXPIM.stDiamond.bUseRawCounts := FALSE;
+fbXPIM.stDiamond.nRequestAssertionID := 16#2203;
+fbXPIM.stDiamond.stBeamParams := PMPS_GVL.cstFullBeam;
+fbXPIM.stDiamond.bValid := TRUE;
+fbXPIM.stReticle.fPosition := -30;
+fbXPIM.stReticle.bUseRawCounts := FALSE;
+fbXPIM.stReticle.nRequestAssertionID := 16#2204;
+fbXPIM.stReticle.stBeamParams := PMPS_GVL.cstSafeBeam;
+fbXPIM.stReticle.bValid := TRUE;
+    
+fbXPIM(
+    stYStage := M5,
+    stZoomStage := M6,
+    stFocusStage := M7,
+    stEl6In := stEl6In,
+    stEl6Out := stEl6Out,
+    fbArbiter := fbArbiter,
+    fbFFHWO := fbFFHWO,
+    nTransitionAssertionId := 16#2200,
+    nUnknownAssertionId := 16#2209);
+
+fbFFHWO.Execute();
+fbArbiter.ElevateRequest(fbDummy);
+fbDummy(FFO:=fbFFHWO,
+        tRateDelay:=T#500ms,
+        tTransDelay:=T#500ms,
+        tPEDelay:=T#500ms,
+        tAptDelay:=T#500ms);]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>
